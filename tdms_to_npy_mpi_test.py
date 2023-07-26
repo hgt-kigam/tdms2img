@@ -13,7 +13,7 @@ time_begin = time.time()
 rank = comm.Get_rank()
 size = comm.Get_size()
 
-input_files = sorted(glob.glob('./test_tdms/*.tdms'))
+input_files = sorted(glob.glob('../test_tdms/*.tdms'))
 length_data = len(input_files)
 part_size = length_data//size
 
