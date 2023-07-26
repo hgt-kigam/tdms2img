@@ -22,7 +22,6 @@ i_end = i_start + part_size
 
 input_files = input_files[i_start:i_end]
 
-
 if(rank == (size-1)):
     i_end = length_data
 
@@ -33,9 +32,8 @@ def tdms_to_npy(input_files, bundle, sample_num, patch_size, trace_start_num):
         data_temp=np.zeros(shape=(sample_num, patch_size))
         data=np.zeros(shape=(sample_num_10deci*bundle, patch_size))
         a = 0
-        for i in range(int(input_count / bundle)):
-            b = i*bundle
-            input_files_temp = input_files[b:b+bundle]
+        for j in range(int(input_count / bundle)):
+            input_files_temp = input_files[j*bundle:(j+1)*bundle]
             time = TdmsFile.read_metadata(input_files_temp[0]).properties['GPSTimeStamp']
             a = 0
             for input_file in input_files_temp:
@@ -45,7 +43,7 @@ def tdms_to_npy(input_files, bundle, sample_num, patch_size, trace_start_num):
                     data_temp[:,i] = trace[trace_start_num+i]
                 data[a:a+sample_num_10deci,:]=data_temp[::10,:]
                 a += sample_num_10deci
-            np.savez(f'./npy_mpi/data_{input_files_temp[0][-22:-9]}_{input_files_temp[-1][-22:-9]}.npy', time=time, data=data)
+            np.savez(f'./npy_mpi/data_{input_files_temp[0][-22:-9]}_{input_files_temp[-1][-22:-9]}.npz', time=time, data=data)
     else:
         print("check input files")
     return
