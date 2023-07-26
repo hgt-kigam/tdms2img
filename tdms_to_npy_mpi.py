@@ -23,8 +23,6 @@ i_end = i_start + part_size
 input_files = input_files[i_start:i_end]
 
 
-#print(len(input_files), i_start, i_end)
-
 if(rank == (size-1)):
     i_end = length_data
 
