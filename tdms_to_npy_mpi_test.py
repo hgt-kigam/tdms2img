@@ -13,7 +13,7 @@ time_begin = time.time()
 rank = comm.Get_rank()
 size = comm.Get_size()
 
-input_files = sorted(glob.glob('../test_tdms/*.tdms'))
+input_files = sorted(glob.glob('/datadisk2/Janggi_Data/2019.07.17-08.14/IDAS DATA/190717-190723/*.tdms'))
 length_data = len(input_files)
 part_size = length_data//size
 
@@ -43,7 +43,7 @@ def tdms_to_npy(input_files, bundle, sample_num, patch_size, trace_start_num):
                     data_temp[:,i] = trace[trace_start_num+i]
                 data[a:a+sample_num_10deci,:]=data_temp[::10,:]
                 a += sample_num_10deci
-            np.savez(f'./npy_mpi/data_{input_files_temp[0][-22:-9]}_{input_files_temp[-1][-22:-9]}.npz', time=time, data=data)
+            np.savez(f'./npz/data_{input_files_temp[0][-22:-9]}_{input_files_temp[-1][-22:-9]}.npz', time=time, data=data)
     else:
         print("check input files")
     return
