@@ -1,3 +1,4 @@
+import os
 import time
 import glob
 import datetime
@@ -27,30 +28,36 @@ if (rank == (size-1)):
     i_end = length_data
 
 
-def tdms_to_img(input_files, start_channel_num, end_channel_num, rank):
+def tdms_to_img(input_files, start_channel_num, end_channel_num, height, clip, rank):
     b = 0
     for input_file in input_files:
         time = TdmsFile.read_metadata(input_file).properties['GPSTimeStamp']
         tdms_file = TdmsFile(input_file)
         trace = tdms_file.groups()[0].channels()
+        sample_num = trace.shape[1]
         data = np.array(trace)[start_channel_num:end_channel_num, :]
-        # data = tdms_file.groups()[0].channels()[start_channel_num:end_channel_num, :]
-        data = perc_clip(data, CLIP)
+        if clip == 100:
+            output_path = './image_1000_487/'
+            os.mkdir(output_path)
+        else:
+            data = perc_clip(data, clip)
+            output_path = './image_1000_487_clip/'
+            os.mkdir(output_path)
         for i in range(int(sample_num/height)):
             a = i * height
             time_delta = np.timedelta64(a, 'ms')
-            name = np2datetime(time+time_delta)
+            name = np_to_datetime(time+time_delta) + '.png'
             image = data[:, a:a+height].T
             plt.imshow(image, cmap='gray_r')
             plt.axis('off')
-            plt.savefig(f'./image_1000_487/{name}.png', format='png', bbox_inches='tight', pad_inches=0)
+            plt.savefig(output_path + name, format='png', bbox_inches='tight', pad_inches=0)
             plt.clf()
         b += 1
-        print(f'{rank}:', b/len(input_files)*100, "%d complite")
+        print(f"{rank}:", f"{ b/len(input_files)*100}% complite")
     return
 
 
-def np2datetime(np_datetime):
+def np_to_datetime(np_datetime):
     np_datetime = np_datetime.astype(datetime.datetime)
     strf_datetime = np_datetime.strftime('%y%m%d_%H%M%S_%f')[:-3]
     return strf_datetime
@@ -60,11 +67,10 @@ desired_pixel = 1299
 dpi = 100
 plt.figure(figsize=(desired_pixel/dpi, desired_pixel/dpi), dpi=dpi)
 
-sample_num = 30000
 height = 1000
-CLIP = 90
+clip = 90
 start_channel_num = 162
 end_channel_num = 649
 
-tdms_to_img(input_files, start_channel_num, end_channel_num, rank)
+tdms_to_img(input_files, start_channel_num, end_channel_num, height, clip, rank)
 print("Total elapsed time", time.time()-start)
