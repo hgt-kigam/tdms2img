@@ -34,15 +34,13 @@ def tdms_to_img(input_files, start_channel_num, end_channel_num, height, clip, r
         time = TdmsFile.read_metadata(input_file).properties['GPSTimeStamp']
         tdms_file = TdmsFile(input_file)
         trace = tdms_file.groups()[0].channels()
-        sample_num = trace.shape[1]
         data = np.array(trace)[start_channel_num:end_channel_num, :]
+        sample_num = data.shape[1]
         if clip == 100:
             output_path = './image_1000_487/'
-            os.mkdir(output_path)
         else:
             data = perc_clip(data, clip)
             output_path = './image_1000_487_clip/'
-            os.mkdir(output_path)
         for i in range(int(sample_num/height)):
             a = i * height
             time_delta = np.timedelta64(a, 'ms')
